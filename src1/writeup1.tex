@@ -31,22 +31,38 @@ The solid blue line in figure \ref{u2} depicts the solution at $t=1$. Unlike the
 
 \begin{figure}[t]
 \begin{center} 
-\includegraphics[width=5in,angle=0]{u2.pdf}
-\caption{The solution to $u_t = u_{xx}$ with  $h=k=1/10$ }
+\includegraphics[width=5in,angle=0]{u1_2_conv.pdf}
+\caption{The solution to $u_t = u_{xx}$ with $\lambda = 1/2$ for a range of meshes.}
 \label{u2} 
 \end{center}
 \end{figure}
 
 \subsection{$\lambda = 1/6$} 
+
+\begin{figure}[t]
+\begin{center} 
+\includegraphics[width=5in,angle=0]{u1_6_conv.pdf}
+\caption{The solution to $u_t = u_{xx}$ with  $\lambda =1/6$ for a range of meshes.  }
+\label{u16} 
+\end{center}
+\end{figure}
+
 The dashed green line in figure \ref{u2} depicts the solution at $t=1$ for $\lambda =1/6$. This solution is clearly different than the one given by $\lambda =1/2$, but is it `better'? 
 
-In class, we showed that truncation error is minimized for $\lambda = 1/6$;  the truncation error is defined as $\tau^k = u^{k} - u^{exact}$ where the superscript $u^k$ refer to the solution on a grid defined by time discretization $k$, and $u^{exact}$ is the exact solution. In this case, we do not have the exact solution, but we can effectively solve for it by using multiple mesh refinements. Assuming the truncation error can be related to the discretization raised to some exponent $r$, such that $\tau^k = Ck^r$, where C is a constant, we can write  
+In class, we showed that truncation error is minimized for $\lambda = 1/6$;  the truncation error is defined as $\tau^k_h = u^{k}_h - u_{exact}$ where the superscript $u_h^k$ refer to the solution on a grid defined by space and  time discretization $h$ and $k$, respectively , and $u^{exact}$ is the exact solution. Assuming the truncation error can be related to the discretization raised to some exponent $a$, such that $\tau_h = Ch^a$, where $C$ is a constant and $a$ is the order of convergence in space, we can write  
 \begin{eqnarray} 
-Ck_1^r= u^{k_1} - u^{exact}\\
-Ck_2^r = u^{k_2} - u^{exact}\\
-Ck_3^r = u^{k_3} - u^{exact}
+Ch_1^a = u_{h_1} - u_{exact}\\
+Ch_2^a= u_{h_2} - u_{exact}\\
+Ch_3^a = u_{h_3} - u_{exact}
 \end{eqnarray} 
-We can solve this system for $r$, the order of convergence, and approximate the exact solution if we choose grids such that $k_3/k_2 = k_2/k_1 =$ constant.
+To compare the convergence rate for different $k$, we need to approximate $u_{exact}$ somehow. We can solve this system for $a$ and approximate $u_{exact}$ if we choose grids such that $k_3/k_2 = k_2/k_1 =$ constant. Eliminating $u_{exact}$ and taking $h_2/h_1 = h_3/h_2 = r$ , the system becomes
+\begin{eqnarray} 
+\frac{u_{h_3}-u_{h_2}}{u_{h_2}-u_{h_1}} &=& \left(\frac{h_2}{h_1}\right)^a \left[\frac{(h_3/h_2)^a -1}{(h_2/h_1)^a-1}\right]\\
+\ln\left( \frac{u_{h_3}-u_{h_2}}{u_{h_2}-u_{h_1}}\right) &=&  a \ln \left(r\right)
+\end{eqnarray} 
+
+From this expression, we can compute the order of convergence $a$ in space. 
+We can also easily compute the order of convergence in time simply by replacing all the $h$'s with $k$'s in the above derivation; all that changes is the grid refinement ratio $r$. For this set of experiments, I chose to halve the spatial discretization each time (e.g. $h_2/h_1$ = 2), so for fixed $\lambda$,  $r =k_2/k_1$ =4. Both of these values are computed in the script convergence.py, where we find that for $\lambda = 1/6$, the error is order 4 in space and order 2 in time. On the other hand, for $\lambda =1/2$,   the error is order 2 in space and  but still order 2 in time. This improved convergence can be readily seen by comparing figures \ref{u2} and \ref{u16}, as the solutions with $\lambda =1/6$ are nearly identical for all spatial discretizations, but have not yet converged for $\lambda = 1/2$.
 
 \section{Comparison with exact solution for  I.C. $u(x,0)= \sin(\pi x)$} 
 
