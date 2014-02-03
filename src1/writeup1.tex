@@ -61,8 +61,10 @@ To compare the convergence rate for different $k$, we need to approximate $u_{ex
 \ln\left( \frac{u_{h_3}-u_{h_2}}{u_{h_2}-u_{h_1}}\right) &=&  a \ln \left(r\right)
 \end{eqnarray} 
 
-From this expression, we can compute the order of convergence $a$ in space. 
-We can also easily compute the order of convergence in time simply by replacing all the $h$'s with $k$'s in the above derivation; all that changes is the grid refinement ratio $r$. For this set of experiments, I chose to halve the spatial discretization each time (e.g. $h_2/h_1$ = 2), so for fixed $\lambda$,  $r =k_2/k_1$ =4. Both of these values are computed in the script convergence.py, where we find that for $\lambda = 1/6$, the error is order 4 in space and order 2 in time. On the other hand, for $\lambda =1/2$,   the error is order 2 in space and  but still order 2 in time. This improved convergence can be readily seen by comparing figures \ref{u2} and \ref{u16}, as the solutions with $\lambda =1/6$ are nearly identical for all spatial discretizations, but have not yet converged for $\lambda = 1/2$.
+From this expression, we can compute the order of convergence $a$ in space from an experiment where we refine the mesh by a constant ratio $r$. By substituting $k$'s for $h$'s in the above derivation, we could also compute the order of convergence in time.  
+
+To compare the order of convergence for $\lambda = 1/6$ and $\lambda = 1/2$, we can run two sets of  three simulations, where we double the spatial refinement twice but keep $ \lambda$ fixed. 
+For this set of experiments, I chose to halve the spatial discretization each time (e.g. $h_2/h_1$ = 2), so for fixed $\lambda$,  $r =k_2/k_1$ =4. Both of these values are computed in the script convergence.py, where we find that for $\lambda = 1/6$, the error is order 4 in space and order 2 in time. On the other hand, for $\lambda =1/2$,   the error is order 2 in space and  but still order 2 in time. This improved convergence can be readily seen by comparing figures \ref{u2} and \ref{u16}, as the solutions with $\lambda =1/6$ are nearly identical for all spatial discretizations, but have not yet converged for $\lambda = 1/2$.
 
 \section{Comparison with exact solution for  I.C. $u(x,0)= \sin(\pi x)$} 
 
