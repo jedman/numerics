@@ -1,3 +1,4 @@
+# cython: profile=True
 import numpy as np 
 import math
 def heat_solver(hinv,kinv,init='sine'):
@@ -41,6 +42,7 @@ def heat_solver_full(hinv,kinv,init='sine'):
     return u
 def exact(x, n, init = 'sine'):
     '''computes the first n terms in the solution to the heat equation at t = 1 for I.C. sin(pi x) and x(1-x) along the interval [0,1] '''
+    cdef double pi = math.pi
     if init == 'sine': 
         u = np.exp(-pi**2*1)*np.sin(pi*x)
     if init == 'arc':

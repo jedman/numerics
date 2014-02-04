@@ -11,18 +11,17 @@
 \title{Math 228b, Spring 2014, homework 1}
 \author{Jake Edman}
 \date{}                                           % Activate to display a given date or no date
-
 \begin{document}
 \maketitle
 \section{Introduction}
 This homework set is primarily concerned with solving the heat equation (or diffusion equation) in one spatial dimension along a bounded interval [0,1], with the solution fixed at 0 at both ends. The heat equation is one of the simplest PDEs, so it seems like a good choice for the first homework. 
 The first part of the assignment deals with the simplest form of this equation, 
 \begin{equation} 
-u_t =u_xx 
+u_t =u_{xx} 
 \end{equation} 
 while later parts introduce a diffusivity coefficient $\alpha$, which may depend on $x$, so the equation becomes
 \begin{equation} 
-u_t = \alpha(x) u_xx
+u_t = \alpha(x) u_{xx}
 \end{equation} 
 
 
@@ -31,11 +30,11 @@ u_t = \alpha(x) u_xx
 For the first part of the homework, I will the following numerical scheme: 
 \begin{equation} 
 u_j^{n+1} = u_j^n + \lambda (u_{j+1}^n - 2u_j^n + u_{j-1}^n)
-\end{equation} 
-where $\lambda = k/h^2$, and $k$ and $h$ are the time and space discretization, respectively.  
+\end{equation}\label{scheme} 
+where $\lambda = k/h^2$, and $k$ and $h$ are the time and space discretization, respectively.  Boundary conditions are applied at the end of each time step, by setting $u(0,(nk)) = u(j_{max}h, nk) = 0$.
 
 
-\subsection{solution for $h=k=1/10$}
+\subsection{solution for $h=k=1/10$; show instability. }
 Figure \ref{u1} depicts the solution at $t=1$.  This solution is clearly very bad, and unstable. Heat should diffuse out along the domain, away from the initial maximum at $x=0.5$, and because there are no sources or sinks in the domain, it should simply flatten out to zero over time, and never become negative.  Additionally, the solution should be symmetrical along the x axis; the initial condition and boundary conditions are symmetric, and there are no sources or sinks to break the symmetry. The solution depicted in figure \ref{u1} changes sign as we move along the x axis, and is not symmetric, which must arise from  numerical instability. Instability is expected; in class, we showed that this scheme is stable for $\lambda \equiv \frac{k}{h^2} \le \frac{1}{2}$, and in this case $\lambda = 10$. 
 
 \begin{figure}[t]
@@ -46,8 +45,8 @@ Figure \ref{u1} depicts the solution at $t=1$.  This solution is clearly very ba
 \end{center}
 \end{figure}
   
-\subsection{solution for $h=1/10$, $k=1/200$}
-The solid blue line in figure \ref{u2} depicts the solution at $t=1$. Unlike the solution depicted in figure \ref{u1}, this solution appears stable, because it is smooth, nonnegative, and symmetric. We expect stability, because $\lambda = 1/2$ in this case. 
+\subsection{solution for $h=1/10$, $k=1/200$; show stability.}
+The solid blue line in figure \ref{u2} depicts the solution at $t=1$. Unlike the solution depicted in figure \ref{u1}, this solution appears stable, because it is smooth, nonnegative, and symmetric. It is behaving as we would expect the heat equation should, diffusing heat outward from the local maximum and gently flattening out over time. Nothing is growing out of control. We expect this stability, because $\lambda = 1/2$ in this case. 
 
 \begin{figure}[t]
 \begin{center} 
@@ -95,6 +94,15 @@ u(x,t) =   \sum\limits_{m = 1}^{\infty} B_m e^{-(m \pi)^2 t} \sin (m \pi x)
 
 To match the initial condition in this case, it is clear we need only  the $m=1$ term, and the constant $B_1$ must equal 1. Thus, the exact solution to the heat equation with I.C. $u(x,0)= \sin(\pi x)$ is $u(x,t) =  e^{-(\pi)^2 t} \sin (\pi x)$.  
 
+The exact and numerical solutions are depicted in figure \ref{usine}.  The computation time for the exact solution is less than 0.0005 seconds, while the numerical solution for $h=1/10$, $k=1/600$ takes 0.024 seconds. Increasing the time step to $k=1/200$ reduces this time to 0.009 seconds, but accuracy is significantly reduced. Additionally, increasing the mesh resolution significantly slows down the numerical solver, (up to 1.5 seconds for $h=1/40$, $k=1/9600$), but makes almost no difference for the exact calculation. 
+
+\begin{figure}[t]
+\begin{center} 
+\includegraphics[width=5in,angle=0]{u_sine.pdf}
+\caption{The solution to $u_t = u_{xx}$ with  $\lambda =1/6$ ($h=1/10 , k = 1/600$) and  $\lambda =1/2$ ($h=1/10 , k = 1/200$)   for I.C. $\sin(\pi x)$. The exact solution is computed with the first  term of the Fourier series solution. }
+\label{usine} 
+\end{center}
+\end{figure}
 
 \section{Comparison with exact solution for  I.C. $u(x,0)= x(1-x)$} 
 
@@ -105,10 +113,34 @@ B_m = 2 \int\limits_0^1  x(1-x) \sin(m \pi x) dx
 Integrating by parts, we find that $B_m = 8/(m \pi)^3$ where m is an odd integer.  
 Thus, the solution to the heat equation with I.C. $u(x,0)= x(1-x)$ is
 \begin{equation} 
- u(x,t) = \sum\limits_{m=0}^{\infty} \frac{8}{((2m+1)\pi)^3} e^{-((2m+1)\pi)^2 t} \sin ((2m+1)\pi x).
+ u(x,t) = \sum\limits_{l=0}^{\infty} \frac{8}{((2l+1)\pi)^3} e^{-((2l+1)\pi)^2 t} \sin ((2l+1)\pi x).
  \end{equation} 
  
-\section{Consider $u_t = \alpha u_{xx}$ on [0,1] with I.C. $u(x,0)= \sin(\pi x)$, where $\alpha$ is a constant. }
+ Evaluating this solution at $t=1$, it quickly becomes clear that any term beyond $l=1$ is negligibly small ($\le 10^{-40}$, due to the factor of  $e^{-((2l+1)\pi)^2 t}$.  Therefore, when computing the exact solution, I will only use the first term of the Fourier series. 
+ 
+ The exact and numerical solutions are depicted in figure \ref{uarc}.  The computation time for the exact solution is less than 0.0005 seconds, while the numerical solution for $h=1/10$, $k=1/600$ takes 0.024 seconds. Increasing the time step to $k=1/200$ reduces this time to 0.009 seconds, but accuracy is significantly reduced (as seen in the previous section). 
+ \begin{figure}[t]
+\begin{center} 
+\includegraphics[width=5in,angle=0]{u_arc.pdf}
+\caption{The solution to $u_t = u_{xx}$ with  $\lambda =1/6$ ($h=1/10 , k = 1/600$) for I.C. $x(1-x)$. The exact solution is computed with the first  term of the Fourier series solution.  }
+\label{uarc} 
+\end{center}
+\end{figure}
+ 
+\section{Consider $u_t = \alpha u_{xx}$ on [0,1] with I.C. $u(x,0)= \sin(\pi x)$, where $\alpha$ is a constant. How does this alter the stability condition? }
+The stability restriction on $\lambda \equiv \frac{k}{h^2}$ for the original scheme \eqref{scheme} can be seen by rewriting \eqref{scheme} as follows: 
+\begin{equation} 
+u_j^{n+1} = u_j^n(1-2\lambda ) + \lambda(u_{j+1}^n + u_{j-1}^n)
+\end{equation} 
+If $\lambda > 1/2$, then the contribution from the first term on the RHS is opposite to the sign of $u_j^n$. If we think about the process of diffusion, this doesn't make much sense. The value at a point should not  make a large contribution of the opposite sign to its value at the next time step (i.e. the value at a point should not switch signs repeatedly). We proved this more rigorously in class by considering how oscillating initial data is amplified in this case. If all the terms on the RHS have the same sign,  as they would if $\lambda >1/2$ and the sign of $u_j$ changes at every point, then the absolute value  of the solution at $u_j^{n+1}$ grows uncontrollably. 
+
+Adding the heat diffusivity coefficient $\alpha$ alters the numerical scheme \eqref{scheme} to the following: 
+
+\begin{equation} 
+u_j^{n+1} - u_j^n = \frac{\alpha k }{h^2}  (u_{j+1}^n - 2u_j^n + u_{j-1}^n)
+\end{equation} 
+
+This is tantamount to factoring out some constant from $\lambda$ as previously defined, so it follows that the new stability condition is  $\alpha k/h^2 \le 1/2$. In other words, the new stability condition is  $\lambda \le \frac{1}{2\alpha}$ (where $\alpha$ is positive). 
 
 
 \section{Consider $u_t = \alpha(x) u_{xx}$ on [0,1] with I.C. $u(x,0)= \sin(\pi x)$ }
