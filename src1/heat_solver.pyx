@@ -39,12 +39,14 @@ def heat_solver_full(hinv,kinv,init='sine'):
         u[i+1,0] = 0
         u[i+1,-1] = 0 
     return u
-def exact(x, init = 'sine'):
-    '''computes the exact solution to the heat equation at t = 1 for I.C. sin(pi x) and x(1-x) along the interval [0,1] '''
+def exact(x, n, init = 'sine'):
+    '''computes the first n terms in the solution to the heat equation at t = 1 for I.C. sin(pi x) and x(1-x) along the interval [0,1] '''
     if init == 'sine': 
         u = np.exp(-pi**2*1)*np.sin(pi*x)
     if init == 'arc':
-        u = x*(1-x)
+        u = np.zeros(len(x)) 
+        for m in xrange(n): 
+            u = u + 8./((2.*m+1)*pi)**3*np.sin((2*m+1)*pi*x)*np.exp(-(pi*(2*m+1))**2*1) 
     return u
 
 

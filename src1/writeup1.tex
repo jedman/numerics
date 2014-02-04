@@ -14,8 +14,28 @@
 
 \begin{document}
 \maketitle
+\section{Introduction}
+This homework set is primarily concerned with solving the heat equation (or diffusion equation) in one spatial dimension along a bounded interval [0,1], with the solution fixed at 0 at both ends. The heat equation is one of the simplest PDEs, so it seems like a good choice for the first homework. 
+The first part of the assignment deals with the simplest form of this equation, 
+\begin{equation} 
+u_t =u_xx 
+\end{equation} 
+while later parts introduce a diffusivity coefficient $\alpha$, which may depend on $x$, so the equation becomes
+\begin{equation} 
+u_t = \alpha(x) u_xx
+\end{equation} 
+
+
 \section{solve $u_t = u_{xx}$ on [0,1] with I.C. $u(x,0)= \sin(\pi x)$}
-\subsection{$h=k=1/10$}
+
+For the first part of the homework, I will the following numerical scheme: 
+\begin{equation} 
+u_j^{n+1} = u_j^n + \lambda (u_{j+1}^n - 2u_j^n + u_{j-1}^n)
+\end{equation} 
+where $\lambda = k/h^2$, and $k$ and $h$ are the time and space discretization, respectively.  
+
+
+\subsection{solution for $h=k=1/10$}
 Figure \ref{u1} depicts the solution at $t=1$.  This solution is clearly very bad, and unstable. Heat should diffuse out along the domain, away from the initial maximum at $x=0.5$, and because there are no sources or sinks in the domain, it should simply flatten out to zero over time, and never become negative.  Additionally, the solution should be symmetrical along the x axis; the initial condition and boundary conditions are symmetric, and there are no sources or sinks to break the symmetry. The solution depicted in figure \ref{u1} changes sign as we move along the x axis, and is not symmetric, which must arise from  numerical instability. Instability is expected; in class, we showed that this scheme is stable for $\lambda \equiv \frac{k}{h^2} \le \frac{1}{2}$, and in this case $\lambda = 10$. 
 
 \begin{figure}[t]
@@ -26,7 +46,7 @@ Figure \ref{u1} depicts the solution at $t=1$.  This solution is clearly very ba
 \end{center}
 \end{figure}
   
-\subsection{$h=1/10$, $k=1/200$}
+\subsection{solution for $h=1/10$, $k=1/200$}
 The solid blue line in figure \ref{u2} depicts the solution at $t=1$. Unlike the solution depicted in figure \ref{u1}, this solution appears stable, because it is smooth, nonnegative, and symmetric. We expect stability, because $\lambda = 1/2$ in this case. 
 
 \begin{figure}[t]
@@ -37,7 +57,7 @@ The solid blue line in figure \ref{u2} depicts the solution at $t=1$. Unlike the
 \end{center}
 \end{figure}
 
-\subsection{$\lambda = 1/6$} 
+\subsection{solution for $\lambda = 1/6$, and compare order of convergence with $\lambda = 1/2$ } 
 
 \begin{figure}[t]
 \begin{center} 
@@ -68,8 +88,26 @@ For this set of experiments, I chose to halve the spatial discretization each ti
 
 \section{Comparison with exact solution for  I.C. $u(x,0)= \sin(\pi x)$} 
 
+The exact solution to the heat equation with  I.C. $u(x,0)= \sin(\pi x)$ can be found easily. By separating variables and applying the boundary conditions, we find that the general solution is given by 
+\begin{equation}
+u(x,t) =   \sum\limits_{m = 1}^{\infty} B_m e^{-(m \pi)^2 t} \sin (m \pi x)   
+\end{equation}\label{gensol}  
+
+To match the initial condition in this case, it is clear we need only  the $m=1$ term, and the constant $B_1$ must equal 1. Thus, the exact solution to the heat equation with I.C. $u(x,0)= \sin(\pi x)$ is $u(x,t) =  e^{-(\pi)^2 t} \sin (\pi x)$.  
+
+
 \section{Comparison with exact solution for  I.C. $u(x,0)= x(1-x)$} 
 
+The exact solution in this case is slightly more complicated than in the previous section, because the initial condition no longer corresponds to an eigenvalue of the height equation. However,  we use the properties of the Fourier transform to find the coefficients $B_m$ that match the initial condition: 
+\begin{equation} 
+B_m = 2 \int\limits_0^1  x(1-x) \sin(m \pi x) dx 
+\end{equation} 
+Integrating by parts, we find that $B_m = 8/(m \pi)^3$ where m is an odd integer.  
+Thus, the solution to the heat equation with I.C. $u(x,0)= x(1-x)$ is
+\begin{equation} 
+ u(x,t) = \sum\limits_{m=0}^{\infty} \frac{8}{((2m+1)\pi)^3} e^{-((2m+1)\pi)^2 t} \sin ((2m+1)\pi x).
+ \end{equation} 
+ 
 \section{Consider $u_t = \alpha u_{xx}$ on [0,1] with I.C. $u(x,0)= \sin(\pi x)$, where $\alpha$ is a constant. }
 
 
