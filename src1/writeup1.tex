@@ -116,7 +116,7 @@ Thus, the solution to the heat equation with I.C. $u(x,0)= x(1-x)$ is
  u(x,t) = \sum\limits_{l=0}^{\infty} \frac{8}{((2l+1)\pi)^3} e^{-((2l+1)\pi)^2 t} \sin ((2l+1)\pi x).
  \end{equation} 
  
- Evaluating this solution at $t=1$, it quickly becomes clear that any term beyond $l=1$ is negligibly small ($\le 10^{-40}$, due to the factor of  $e^{-((2l+1)\pi)^2 t}$.  Therefore, when computing the exact solution, I will only use the first term of the Fourier series. 
+ Evaluating this solution at $t=1$, it quickly becomes clear that any term beyond $l=1$ is negligibly small ($\le 10^{-40}$, due to the factor of  $e^{-((2l+1)\pi)^2 t}$, which damps out all the higher order terms fairly quickly.  Therefore, when computing the exact solution, I will only use the first term of the Fourier series. 
  
  The exact and numerical solutions are depicted in figure \ref{uarc}.  The computation time for the exact solution is less than 0.0005 seconds, while the numerical solution for $h=1/10$, $k=1/600$ takes 0.024 seconds. Increasing the time step to $k=1/200$ reduces this time to 0.009 seconds, but accuracy is significantly reduced (as seen in the previous section). 
  \begin{figure}[t]
@@ -143,7 +143,7 @@ u_j^{n+1} - u_j^n = \frac{\alpha k }{h^2}  (u_{j+1}^n - 2u_j^n + u_{j-1}^n)
 This is tantamount to factoring out some constant from $\lambda$ as previously defined, so it follows that the new stability condition is  $\alpha k/h^2 \le 1/2$. In other words, the new stability condition is  $\lambda \le \frac{1}{2\alpha}$ (where $\alpha$ is positive). 
 
 
-\section{Consider $u_t = \alpha(x) u_{xx}$ on [0,1] with I.C. $u(x,0)= \sin(\pi x)$ }
+\section{Consider $u_t = \alpha(x) u_{xx}$ on [0,1] with I.C. $u(x,0)= \sin(\pi x)$. Can you make a scheme that works for both smooth and  discontinuous $\alpha(x)$? }
 
 
 \end{document}  
