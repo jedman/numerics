@@ -16,6 +16,15 @@ def coeff_dis(x):
 			alpha2[i] = 1
 	return alpha2
 
+def coeff_step(x):
+	alpha2 = np.zeros(len(x))
+	for i in range(len(x)): 
+		if x[i] < 0.5:
+			alpha2[i]= 10
+		else: 
+			alpha2[i] = 1
+	return alpha2
+
 hinv = 10 
 kinv = 600 
 time600 = np.linspace(0,1,num=kinv+1)
