@@ -128,11 +128,15 @@ Thus, the solution to the heat equation with I.C. $u(x,0)= x(1-x)$ is
 \end{figure}
  
 \section{Consider $u_t = \alpha u_{xx}$ on [0,1] with I.C. $u(x,0)= \sin(\pi x)$, where $\alpha$ is a constant. How does this alter the stability condition? }
-The stability restriction on $\lambda \equiv \frac{k}{h^2}$ for the original scheme \eqref{scheme} can be seen by rewriting \eqref{scheme} as follows: 
+The stability restriction on $\lambda \equiv \frac{k}{h^2}$ for the original scheme \eqref{scheme} can found through von Neumann stability analysis. Beginning with equation \eqref{scheme}, and plugging in wavelike initial data of the form $u= e^{i j \xi}$,
 \begin{equation} 
-u_j^{n+1} = u_j^n(1-2\lambda ) + \lambda(u_{j+1}^n + u_{j-1}^n)
-\end{equation} 
-If $\lambda > 1/2$, then the contribution from the first term on the RHS is opposite to the sign of $u_j^n$. If we think about the process of diffusion, this doesn't make much sense. The value at a point should not  make a large contribution of the opposite sign to its value at the next time step (i.e. the value at a point should not switch signs repeatedly). We proved this more rigorously in class by considering how oscillating initial data is amplified in this case. If all the terms on the RHS have the same sign,  as they would if $\lambda >1/2$ and the sign of $u_j$ changes at every point, then the absolute value  of the solution at $u_j^{n+1}$ grows uncontrollably. 
+u_j^{1} = e^{i j \xi}(1-4\lambda \sin^2(\frac{\xi}{2}))
+\end{equation}
+where $\lambda = k/h^2$, $k$ is the time step, $h$ is the grid spacing, and $(1-4\lambda \sin^2(\frac{\xi}{2}))$ is the `amplification factor.'  
+If $\lambda < 1/2$, then the amplification factor is less than 1 and the solution is stable ( it does not grow unboundedly). 
+
+%If we think about the process of diffusion, this doesn't make much sense. The value at a point should not  make a large contribution of the opposite sign to its value at the next time step (i.e. the value at a point should not switch signs repeatedly). We proved this more rigorously in class by considering how oscillating initial data is amplified in this case. If all the terms on the RHS have the same sign,  as they would if $\lambda >1/2$ and the sign of $u_j$ changes at every point, then the absolute value  of the solution at $u_j^{n+1}$ grows uncontrollably.
+ 
 
 Adding the heat diffusivity coefficient $\alpha$ alters the numerical scheme \eqref{scheme} to the following: 
 
@@ -145,5 +149,65 @@ This is tantamount to factoring out some constant from $\lambda$ as previously d
 
 \section{Consider $u_t = \alpha(x) u_{xx}$ on [0,1] with I.C. $u(x,0)= \sin(\pi x)$. Can you make a scheme that works for both smooth and  discontinuous $\alpha(x)$? }
 
+The naive approach to solve this equation is to simply keep the same scheme as before, but use a time step small enough to ensure that $\lambda < 1/(2\alpha)$ everywhere. This results in a scheme that looks like this
+\begin{equation} 
+u_j^{n+1} - u_j^n = \frac{\alpha_j k }{h^2}  (u_{j+1}^n - 2u_j^n + u_{j-1}^n)
+\end{equation} 
+but includes an additional preprocessing step in which $k$ is adjusted to ensure $\frac{\alpha_j k }{h^2} \le 1/2$. The main problem I foresee with this approach is that $\lambda$ is no longer constant across the domain. This means that the amplification factor is a function of position, the truncation error will tend to pile up in certain places-- namely, regions with values of $\alpha\lambda$ further from $1/6$. This a problem because  the error building up in some parts of the mesh could diffuse out throughout the mesh and influence the evolution of the solution. This could in particular pose a problem for discontinuous $\alpha(x)$, because the convergence properties (which depends on ($\alpha\lambda$) of the scheme will vary rapidly from point to point.  
+
+\begin{figure}
+\begin{center} 
+\includegraphics[width=5in,angle=0]{unl_conv.pdf}
+\caption{The solution to $u_t =\alpha(x) u_{xx}$ with  $\alpha = e^{2x} $ for a range of meshes, all with $\lambda < 1/2$ .  }
+\label{nlexp} 
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center} 
+\includegraphics[width=5in,angle=0]{unl_orderconv.pdf}
+\caption{The space and time order of convergence (as defined in section 2.3) as a function of x for  $\alpha = e^{2x} $ for a range of meshes, all with $\alpha\lambda < 1/2$. $\lambda\alpha$ is plotted as a function of x in the bottom panel. }
+\label{nlorder} 
+\end{center}
+\end{figure}
+
+In figure \ref{nlexp}, we see the results for 3 different spatial meshes for $\alpha(x) = e^{2x}$ with I.C. $\sin(\pi x)$. The chosen scheme preserves stability for this choice of $\alpha$, as expected, and at qualitatively makes sense. As the heat diffusivity $\alpha$ increases along $x$, the slope of $u$ becomes stepper, because heat is able to diffuse more efficiently. This leads to a slightly asymmetry in the solution. An additional check on the numerical scheme is to use a mirror image of $\alpha(x)$, because this should produce an exactly mirrored solution ($\alpha$ is the only thing that breaks symmetry in the problem).  I tried this for a few different $\alpha$ (not pictured), including $\alpha = e^(3x)$, $\alpha = x(1-x)$,  $\alpha = 2x^3$, and $\alpha = 2x^4$, and each time the scheme reproduced the solution in mirror form (with mirrored $\alpha$). 
+
+Figure \ref{nlorder} shows the order of convergence for $\alpha = e^{2x}$, as estimated from mesh refinements akin to section 2.3, as well as how $\lambda \alpha$ varies in space for this case. $\lambda \alpha$ is always less than $1/2$, which ensures stability, but as seen in the top two panels, the order of convergence varies in space as well. However, in this simple case, it seems as though the order of convergence is roughly equal to what it would be if $\alpha\lambda = 1/2$ everywhere. Despite the fact that at some points $\lambda \alpha$ is close to $1/6$, the whole scheme converges slightly worse than if  $\lambda \alpha = 1/2$ everywhere. 
+
+
+\begin{figure}
+\begin{center} 
+\includegraphics[width=5in,angle=0]{unl_convdis.pdf}
+\caption{The solution to $u_t =\alpha(x) u_{xx}$ with  $\alpha= 10$ for $x<0.5$, and $\alpha = 1$ everywhere else, for a range of meshes, all with $\lambda < 1/2$ .  }
+\label{nlexpdis} 
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center} 
+\includegraphics[width=5in,angle=0]{unl_orderconvdis.pdf}
+\caption{The space and time order of convergence (as defined in section 2.3) as a function of x for   $\alpha= 10$ for $x<0.5$, and $\alpha = 1$ everywhere else, for a range of meshes, all with $\alpha\lambda < 1/2$. $\lambda\alpha$ is plotted as a function of x in the bottom panel. }
+\label{nlorderdis} 
+\end{center}
+\end{figure}
+
+For the discontinuous case, I will start by testing a simple case, a step function, where $\alpha = 10$ for $x <0.5$ and $\alpha = 1$ for $x \ge 0.5$. The results of the mesh refinement test for this case are in figure \ref{nlexpdis}. Again, we see that, qualitatively, this solution makes sense, with heat diffusing more quickly in the region of large $\alpha$. However, the convergence is quite poor. Even at a mesh size of $h=1/80$, $k=1/128000$, there is still significant change to the solution. Indeed, if we look at  figure \ref{nlorderdis}, we see that the convergence is worse for the region with $\alpha = 1$ than $\alpha = 10$, even though this region has small $\alpha\lambda$. This case is also robust to reversal of $\alpha$ (e.g. $\alpha = 10$ for $x >0.5$ and $\alpha = 1$ for $x \le 0.5$). 
+
+Although this scheme kind of works for these particular cases, it is inefficient, because the time step is limited by the maximum value of $\alpha(x)$, and has potentially very bad convergence behavior due to the spatial variation of the amplification factor.  Indeed, for a different choice of $\alpha$, a piecewise discontinuous function with $\alpha = 10$ for $x >0.5$ and $\alpha = 1$ for $0.3 < x \le 0.5$, and $\alpha = 5$ for $x \le 0.3$, the scheme does very poorly for coarser mesh sizes, although the solution appears to converge for finer meshes (figure \ref{nlexpdis2}), with even higher order estimated convergence (figure \ref{nlorderdis2}). So, while this scheme is very inefficient, it appears to still converge for fine enough meshes. 
+
+\begin{figure}
+\begin{center} 
+\includegraphics[width=5in,angle=0]{unl_convdis2.pdf}
+\caption{Solutions to $u_t =\alpha(x) u_{xx}$ with $\lambda < 1/2$. $\alpha$ is piecewise discontinuous:  $\alpha = 10$ for $x >0.5$ and $\alpha = 1$ for $0.3 < x \le 0.5$, and $\alpha = 5$ for $x \le 0.3$  }
+\label{nlexpdis2} 
+\includegraphics[width=5in,angle=0]{unl_orderconvdis2.pdf}
+\caption{The space and time order of convergence and  $\lambda\alpha$  as a function of x. $\alpha$ is piecewise discontinuous  $\alpha = 10$ for $x >0.5$ and $\alpha = 1$ for $0.3 < x \le 0.5$, and $\alpha = 5$ for $x \le 0.3$ for a range of meshes, all with $\alpha\lambda < 1/2$.}
+\label{nlorderdis2} 
+\end{center}
+\end{figure}
+
+ 
+I think a better approach is to keep $\alpha\lambda$ constant throughout the domain, and instead vary $k$ or $j$. This would make the nonlinear heat equation behave like the linear one, at least numerically, at the expense of having to subdivide time or space steps in a nonuniform way. However, I haven't (yet) been able to come up with a way of implementing this adaptive mesh. 
 
 \end{document}  
