@@ -208,6 +208,18 @@ Although this scheme kind of works for these particular cases, it is inefficient
 \end{figure}
 
  
-I think a better approach is to keep $\alpha\lambda$ constant throughout the domain, and instead vary $k$ or $j$. This would make the nonlinear heat equation behave like the linear one, at least numerically, at the expense of having to subdivide time or space steps in a nonuniform way. However, I haven't (yet) been able to come up with a way of implementing this adaptive mesh. 
+I think a better approach is to keep $\alpha\lambda$ constant throughout the domain, and instead vary $k$ or $j$. This would make the nonlinear heat equation behave like the linear one, at least numerically, at the expense of having to subdivide time or space steps in a nonuniform way. An example of a scheme like this would be the following: 
+
+\begin{equation} 
+u_j^{n+2m_j} = u_j^n +\frac{\alpha_j m_j }{h^2}  (u_{j}^{n+m_j} - 2u_{j-1}^{n+m_j} + u_{j-2}^{n+m_j})
+\end{equation} 
+
+where $k$ is an adaptive time step calculated for each spatial point such that $m_j = \frac{h^2}{6\alpha_j}$. 
+Note that, for compared to \eqref{scheme}, this scheme uses a backward difference scheme for $u_{xx}$ rather than a centered scheme. The reason for this is that, as the solver works from $j=0$ to $j=j_{max}$, the values of $u_{j-1}^{n+m_j}$ and $u_{j-2}^{n+m_j}$ at each sub step can be calculated by the following formula: 
+\begin{eqnarray} 
+ u_{j-2}^{n+2m_j} = \frac{u_{j-2}^{n+1}- u_{j-2}^{n}}{k} m_j \\
+  u_{j-1}^{n+2m_j} = \frac{u_{j-1}^{n+1}- u_{j-1}^{n}}{k} m_j 
+\end{eqnarray} 
+In this way, a value of $u_j$ can be found at each whole time step $k$, by doing  $m_j/k$ sub steps at each grid point. 
 
 \end{document}  
